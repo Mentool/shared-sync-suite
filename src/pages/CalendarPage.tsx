@@ -2,17 +2,28 @@ import Navigation from "@/components/Navigation";
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import AddEventDialog from "@/components/AddEventDialog";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useCalendarEvents, useDeleteCalendarEvent } from "@/hooks/useCalendarEvents";
+import { format, parseISO } from "date-fns";
 
 const CalendarPage = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const { data: events = [], isLoading } = useCalendarEvents();
+  const deleteEvent = useDeleteCalendarEvent();
 
-  const events = [
-    { date: "2025-11-01", title: "School pickup", time: "3:00 PM", type: "pickup" },
-    { date: "2025-11-03", title: "Doctor appointment", time: "10:00 AM", type: "medical" },
-    { date: "2025-11-05", title: "Custody exchange", time: "5:00 PM", type: "custody" },
-  ];
+  const getEventTypeColor = (type: string) => {
+    const colors = {
+      pickup: "bg-primary/10 text-primary",
+      medical: "bg-secondary/10 text-secondary",
+      custody: "bg-accent/10 text-accent-foreground",
+      school: "bg-blue-100 text-blue-700",
+      activity: "bg-green-100 text-green-700",
+      other: "bg-muted text-muted-foreground",
+    };
+    return colors[type as keyof typeof colors] || colors.other;
+  };
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -24,10 +35,7 @@ const CalendarPage = () => {
             <h1 className="text-3xl font-bold text-foreground mb-2">Shared Calendar</h1>
             <p className="text-muted-foreground">Manage custody schedules and important events</p>
           </div>
-          <Button variant="warm" className="gap-2">
-            <Plus className="w-4 h-4" />
-            Add Event
-          </Button>
+          <AddEventDialog />
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -43,30 +51,53 @@ const CalendarPage = () => {
           <div className="space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-semibold text-foreground mb-4">Upcoming Events</h2>
-              <div className="space-y-3">
-                {events.map((event, index) => (
-                  <div key={index} className="p-4 rounded-lg bg-gradient-to-r from-muted/50 to-muted/30 border border-border">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-foreground">{event.title}</h3>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        event.type === 'pickup' ? 'bg-primary/10 text-primary' :
-                        event.type === 'medical' ? 'bg-secondary/10 text-secondary' :
-                        'bg-accent/10 text-accent-foreground'
-                      }`}>
-                        {event.type}
-                      </span>
+              {isLoading ? (
+                <div className="text-center py-8 text-muted-foreground">Loading events...</div>
+              ) : events.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No events yet. Add your first event to get started!
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {events.map((event) => (
+                    <div key={event.id} className="p-4 rounded-lg bg-gradient-to-r from-muted/50 to-muted/30 border border-border group">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-foreground">{event.title}</h3>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs px-2 py-1 rounded-full ${getEventTypeColor(event.type)}`}>
+                            {event.type}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => deleteEvent.mutate(event.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                      {event.event_time && (
+                        <p className="text-sm text-muted-foreground">
+                          {format(parseISO(`2000-01-01T${event.event_time}`), "h:mm a")}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {format(parseISO(event.event_date), "MMMM d, yyyy")}
+                      </p>
+                      {event.description && (
+                        <p className="text-sm text-muted-foreground mt-2">{event.description}</p>
+                      )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{event.time}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{event.date}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </Card>
             
             <Card className="p-6 bg-gradient-warm text-white">
               <h3 className="font-semibold mb-2">Custody Schedule</h3>
               <p className="text-sm text-white/90 mb-4">
-                Current week: Your custody days are Monday, Tuesday, and Wednesday
+                View and manage your custody arrangement schedule
               </p>
               <Button variant="outline" className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30">
                 View Full Schedule
