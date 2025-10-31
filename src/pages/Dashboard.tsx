@@ -1,6 +1,6 @@
 import Navigation from "@/components/Navigation";
 import DashboardCard from "@/components/DashboardCard";
-import { Calendar, MessageSquare, DollarSign, Users } from "lucide-react";
+import { Calendar, MessageSquare, DollarSign, Users, BookHeart } from "lucide-react";
 
 const Dashboard = () => {
   return (
@@ -38,6 +38,13 @@ const Dashboard = () => {
             description="Track and exchange payments for child-related expenses"
             icon={DollarSign}
             to="/payments"
+          />
+          
+          <DashboardCard
+            title="Memory Journal"
+            description="Capture precious moments and milestones"
+            icon={BookHeart}
+            to="/memory-journal"
           />
           
           <DashboardCard

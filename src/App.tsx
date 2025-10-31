@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import CalendarPage from "./pages/CalendarPage";
 import MessagesPage from "./pages/MessagesPage";
 import PaymentsPage from "./pages/PaymentsPage";
+import MemoryJournal from "./pages/MemoryJournal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/payments" element={<PaymentsPage />} />
+            <Route path="/memory-journal" element={<MemoryJournal />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

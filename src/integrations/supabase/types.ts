@@ -50,6 +50,80 @@ export type Database = {
         }
         Relationships: []
       }
+      children: {
+        Row: {
+          created_at: string
+          date_of_birth: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      memory_entries: {
+        Row: {
+          child_id: string
+          content: string | null
+          created_at: string
+          entry_type: string
+          id: string
+          image_url: string | null
+          milestone_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          child_id: string
+          content?: string | null
+          created_at?: string
+          entry_type: string
+          id?: string
+          image_url?: string | null
+          milestone_date?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          child_id?: string
+          content?: string | null
+          created_at?: string
+          entry_type?: string
+          id?: string
+          image_url?: string | null
+          milestone_date?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_entries_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
