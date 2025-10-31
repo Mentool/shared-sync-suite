@@ -29,7 +29,7 @@ const eventSchema = z.object({
   event_date: z.string().min(1, "Date is required"),
   event_time: z.string().optional(),
   type: z.enum(["pickup", "medical", "custody", "school", "activity", "other"]),
-  recurrence_pattern: z.enum(["none", "daily", "weekly", "monthly"]),
+  recurrence_pattern: z.enum(["none", "daily", "weekly", "biweekly", "monthly"]),
   recurrence_end_date: z.string().optional(),
 }).refine(
   (data) => {
@@ -207,6 +207,7 @@ const AddEventDialog = () => {
                 <SelectItem value="none">Does not repeat</SelectItem>
                 <SelectItem value="daily">Daily</SelectItem>
                 <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="biweekly">Every other week</SelectItem>
                 <SelectItem value="monthly">Monthly</SelectItem>
               </SelectContent>
             </Select>

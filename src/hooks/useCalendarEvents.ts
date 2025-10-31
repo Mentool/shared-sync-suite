@@ -10,7 +10,7 @@ export interface CalendarEvent {
   event_date: string;
   event_time: string | null;
   type: "pickup" | "medical" | "custody" | "school" | "activity" | "other";
-  recurrence_pattern: "none" | "daily" | "weekly" | "monthly";
+  recurrence_pattern: "none" | "daily" | "weekly" | "biweekly" | "monthly";
   recurrence_end_date: string | null;
   parent_event_id: string | null;
   created_at: string;
@@ -121,6 +121,9 @@ const generateRecurringEvents = (
     case "weekly":
       currentDate.setDate(currentDate.getDate() + 7);
       break;
+    case "biweekly":
+      currentDate.setDate(currentDate.getDate() + 14);
+      break;
     case "monthly":
       currentDate.setMonth(currentDate.getMonth() + 1);
       break;
@@ -145,6 +148,9 @@ const generateRecurringEvents = (
         break;
       case "weekly":
         currentDate.setDate(currentDate.getDate() + 7);
+        break;
+      case "biweekly":
+        currentDate.setDate(currentDate.getDate() + 14);
         break;
       case "monthly":
         currentDate.setMonth(currentDate.getMonth() + 1);
