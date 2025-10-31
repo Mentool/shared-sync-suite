@@ -1,0 +1,78 @@
+import { Link, useLocation } from "react-router-dom";
+import { Home, Calendar, MessageSquare, DollarSign } from "lucide-react";
+import { cn } from "@/lib/utils";
+import logo from "@/assets/logo.png";
+
+const Navigation = () => {
+  const location = useLocation();
+  
+  const links = [
+    { to: "/", icon: Home, label: "Home" },
+    { to: "/calendar", icon: Calendar, label: "Calendar" },
+    { to: "/messages", icon: MessageSquare, label: "Messages" },
+    { to: "/payments", icon: DollarSign, label: "Payments" },
+  ];
+
+  return (
+    <nav className="bg-card border-b border-border shadow-card sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <Link to="/" className="flex items-center space-x-3">
+            <img src={logo} alt="Pairent Logo" className="h-10" />
+          </Link>
+          
+          <div className="hidden md:flex space-x-1">
+            {links.map((link) => {
+              const Icon = link.icon;
+              const isActive = location.pathname === link.to;
+              
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300",
+                    isActive
+                      ? "bg-gradient-warm text-white shadow-soft"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{link.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      
+      {/* Mobile Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-card">
+        <div className="flex justify-around items-center h-16">
+          {links.map((link) => {
+            const Icon = link.icon;
+            const isActive = location.pathname === link.to;
+            
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={cn(
+                  "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-300",
+                  isActive
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                )}
+              >
+                <Icon className={cn("w-5 h-5", isActive && "scale-110")} />
+                <span className="text-xs font-medium">{link.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navigation;
