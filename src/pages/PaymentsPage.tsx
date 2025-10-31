@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import PaymentForm from "@/components/PaymentForm";
+import ExportPayments from "@/components/ExportPayments";
 import { usePayments } from "@/hooks/usePayments";
 import { useMemo } from "react";
 import { format } from "date-fns";
@@ -31,15 +32,18 @@ const PaymentsPage = () => {
       <Navigation />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Payments</h1>
             <p className="text-muted-foreground">Track and manage child-related expenses</p>
           </div>
-          <Button variant="warm" className="gap-2">
-            <Plus className="w-4 h-4" />
-            New Payment
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            <ExportPayments payments={payments} totals={totals} />
+            <Button variant="warm" className="gap-2">
+              <Plus className="w-4 h-4" />
+              New Payment
+            </Button>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
