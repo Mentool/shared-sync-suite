@@ -7,14 +7,26 @@ import { useState } from "react";
 
 const MessagesPage = () => {
   const [message, setMessage] = useState("");
-  
-  const messages = [
+  const [messages, setMessages] = useState([
     { id: 1, sender: "co-parent", text: "Hi, can we discuss the summer schedule?", time: "10:30 AM" },
     { id: 2, sender: "me", text: "Of course! What dates did you have in mind?", time: "10:45 AM" },
     { id: 3, sender: "co-parent", text: "I was thinking the first two weeks of July for my vacation time", time: "11:00 AM" },
     { id: 4, sender: "me", text: "That works for me. I'll plan for the last two weeks of July then.", time: "11:15 AM" },
     { id: 5, sender: "co-parent", text: "Perfect! I'll update the calendar.", time: "11:20 AM" },
-  ];
+  ]);
+
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      const newMessage = {
+        id: messages.length + 1,
+        sender: "me",
+        text: message,
+        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      };
+      setMessages([...messages, newMessage]);
+      setMessage("");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,7 +78,7 @@ const MessagesPage = () => {
                 onKeyPress={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    setMessage("");
+                    handleSendMessage();
                   }
                 }}
               />
@@ -74,11 +86,7 @@ const MessagesPage = () => {
                 variant="warm" 
                 size="icon" 
                 className="h-12 w-12 flex-shrink-0 relative z-20"
-                onClick={() => {
-                  if (message.trim()) {
-                    setMessage("");
-                  }
-                }}
+                onClick={handleSendMessage}
               >
                 <Send className="w-5 h-5" />
               </Button>
