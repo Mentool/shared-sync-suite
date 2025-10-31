@@ -21,6 +21,9 @@ export type Database = {
           event_date: string
           event_time: string | null
           id: string
+          parent_event_id: string | null
+          recurrence_end_date: string | null
+          recurrence_pattern: string | null
           title: string
           type: string
           updated_at: string
@@ -32,6 +35,9 @@ export type Database = {
           event_date: string
           event_time?: string | null
           id?: string
+          parent_event_id?: string | null
+          recurrence_end_date?: string | null
+          recurrence_pattern?: string | null
           title: string
           type: string
           updated_at?: string
@@ -43,12 +49,23 @@ export type Database = {
           event_date?: string
           event_time?: string | null
           id?: string
+          parent_event_id?: string | null
+          recurrence_end_date?: string | null
+          recurrence_pattern?: string | null
           title?: string
           type?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_parent_event_id_fkey"
+            columns: ["parent_event_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       children: {
         Row: {

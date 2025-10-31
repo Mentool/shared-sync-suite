@@ -29,7 +29,20 @@ const eventSchema = z.object({
   event_date: z.string().min(1, "Date is required"),
   event_time: z.string().optional(),
   type: z.enum(["pickup", "medical", "custody", "school", "activity", "other"]),
-});
+  recurrence_pattern: z.enum(["none", "daily", "weekly", "monthly"]),
+  recurrence_end_date: z.string().optional(),
+}).refine(
+  (data) => {
+    if (data.recurrence_pattern !== "none" && !data.recurrence_end_date) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: "End date is required for recurring events",
+    path: ["recurrence_end_date"],
+  }
+);
 
 const AddEventDialog = () => {
   const [open, setOpen] = useState(false);
@@ -38,6 +51,8 @@ const AddEventDialog = () => {
   const [eventDate, setEventDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [eventTime, setEventTime] = useState("");
   const [type, setType] = useState<CalendarEvent["type"]>("other");
+  const [recurrencePattern, setRecurrencePattern] = useState<CalendarEvent["recurrence_pattern"]>("none");
+  const [recurrenceEndDate, setRecurrenceEndDate] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const addEvent = useAddCalendarEvent();
@@ -52,6 +67,8 @@ const AddEventDialog = () => {
       event_date: eventDate,
       event_time: eventTime || undefined,
       type,
+      recurrence_pattern: recurrencePattern,
+      recurrence_end_date: recurrenceEndDate || undefined,
     });
 
     if (!result.success) {
@@ -73,6 +90,8 @@ const AddEventDialog = () => {
         event_date: validatedData.event_date,
         event_time: validatedData.event_time,
         type: validatedData.type,
+        recurrence_pattern: validatedData.recurrence_pattern,
+        recurrence_end_date: validatedData.recurrence_end_date,
       },
       {
         onSuccess: () => {
@@ -81,6 +100,8 @@ const AddEventDialog = () => {
           setEventDate(format(new Date(), "yyyy-MM-dd"));
           setEventTime("");
           setType("other");
+          setRecurrencePattern("none");
+          setRecurrenceEndDate("");
           setOpen(false);
         },
       }
@@ -175,6 +196,38 @@ const AddEventDialog = () => {
             />
             {errors.description && <p className="text-sm text-destructive mt-1">{errors.description}</p>}
           </div>
+
+          <div>
+            <Label htmlFor="recurrence_pattern">Recurrence</Label>
+            <Select value={recurrencePattern} onValueChange={(value) => setRecurrencePattern(value as CalendarEvent["recurrence_pattern"])}>
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select recurrence pattern" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Does not repeat</SelectItem>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.recurrence_pattern && <p className="text-sm text-destructive mt-1">{errors.recurrence_pattern}</p>}
+          </div>
+
+          {recurrencePattern !== "none" && (
+            <div>
+              <Label htmlFor="recurrence_end_date">Repeat Until</Label>
+              <Input
+                id="recurrence_end_date"
+                type="date"
+                value={recurrenceEndDate}
+                onChange={(e) => setRecurrenceEndDate(e.target.value)}
+                className="mt-1"
+                min={eventDate}
+                disabled={addEvent.isPending}
+              />
+              {errors.recurrence_end_date && <p className="text-sm text-destructive mt-1">{errors.recurrence_end_date}</p>}
+            </div>
+          )}
 
           <div className="flex gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
