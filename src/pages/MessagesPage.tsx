@@ -17,16 +17,16 @@ const MessagesPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-0 md:pb-0">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] flex flex-col px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
+      <main className="h-[calc(100vh-128px)] md:h-[calc(100vh-64px)] flex flex-col px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
         <div className="mb-4">
           <h1 className="text-2xl font-bold text-foreground mb-1">Messages</h1>
           <p className="text-sm text-muted-foreground">Communicate with your co-parent</p>
         </div>
         
-        <Card className="flex flex-col flex-1 min-h-0">
+        <Card className="flex flex-col flex-1 min-h-0 relative z-10">
           <div className="p-4 border-b border-border bg-gradient-warm text-white flex-shrink-0">
             <h2 className="font-semibold text-lg">Co-Parent</h2>
             <p className="text-sm text-white/80">Active now</p>
@@ -56,20 +56,30 @@ const MessagesPage = () => {
             ))}
           </div>
           
-          <div className="p-4 md:p-6 border-t border-border bg-card flex-shrink-0">
+          <div className="p-4 md:p-6 border-t border-border bg-card flex-shrink-0 relative z-20">
             <div className="flex gap-2 md:gap-3">
               <Input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 h-12"
+                className="flex-1 h-12 bg-background relative z-20"
                 onKeyPress={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
                     setMessage("");
                   }
                 }}
               />
-              <Button variant="warm" size="icon" className="h-12 w-12 flex-shrink-0">
+              <Button 
+                variant="warm" 
+                size="icon" 
+                className="h-12 w-12 flex-shrink-0 relative z-20"
+                onClick={() => {
+                  if (message.trim()) {
+                    setMessage("");
+                  }
+                }}
+              >
                 <Send className="w-5 h-5" />
               </Button>
             </div>
