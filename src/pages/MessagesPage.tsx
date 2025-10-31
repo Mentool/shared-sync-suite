@@ -17,35 +17,35 @@ const MessagesPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
+    <div className="min-h-screen bg-background pb-0 md:pb-0">
       <Navigation />
       
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Messages</h1>
-          <p className="text-muted-foreground">Communicate with your co-parent</p>
+      <main className="h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] flex flex-col px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-foreground mb-1">Messages</h1>
+          <p className="text-sm text-muted-foreground">Communicate with your co-parent</p>
         </div>
         
-        <Card className="flex flex-col h-[calc(100vh-300px)] md:h-[600px]">
-          <div className="p-6 border-b border-border bg-gradient-warm text-white">
-            <h2 className="font-semibold">Co-Parent</h2>
+        <Card className="flex flex-col flex-1 min-h-0">
+          <div className="p-4 border-b border-border bg-gradient-warm text-white flex-shrink-0">
+            <h2 className="font-semibold text-lg">Co-Parent</h2>
             <p className="text-sm text-white/80">Active now</p>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 min-h-0">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[70%] rounded-lg p-4 ${
+                  className={`max-w-[75%] md:max-w-[70%] rounded-lg p-3 md:p-4 ${
                     msg.sender === "me"
                       ? "bg-gradient-warm text-white"
                       : "bg-muted text-foreground"
                   }`}
                 >
-                  <p className="text-sm">{msg.text}</p>
+                  <p className="text-sm md:text-base">{msg.text}</p>
                   <p className={`text-xs mt-1 ${
                     msg.sender === "me" ? "text-white/70" : "text-muted-foreground"
                   }`}>
@@ -56,21 +56,21 @@ const MessagesPage = () => {
             ))}
           </div>
           
-          <div className="p-6 border-t border-border bg-card">
-            <div className="flex gap-3">
+          <div className="p-4 md:p-6 border-t border-border bg-card flex-shrink-0">
+            <div className="flex gap-2 md:gap-3">
               <Input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1"
+                className="flex-1 h-12"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     setMessage("");
                   }
                 }}
               />
-              <Button variant="warm" size="icon">
-                <Send className="w-4 h-4" />
+              <Button variant="warm" size="icon" className="h-12 w-12 flex-shrink-0">
+                <Send className="w-5 h-5" />
               </Button>
             </div>
           </div>
