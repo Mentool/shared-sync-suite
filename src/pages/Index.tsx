@@ -19,13 +19,13 @@ const Index = () => {
               Communicate, coordinate, and manage shared responsibilities—all in one place.
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
-              <Link to="/dashboard">
+              <Link to="/auth">
                 <Button variant="warm" size="lg" className="gap-2">
                   Get Started
                   <Heart className="w-4 h-4" />
                 </Button>
               </Link>
-              <Link to="/dashboard">
+              <Link to="/auth">
                 <Button variant="outline" size="lg">
                   Learn More
                 </Button>
@@ -91,7 +91,7 @@ const Index = () => {
             <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
               Join thousands of parents who are making co-parenting easier with Pairent
             </p>
-            <Link to="/dashboard">
+            <Link to="/auth">
               <Button variant="outline" size="lg" className="bg-white text-navy hover:bg-white/90">
                 Start Today
               </Button>

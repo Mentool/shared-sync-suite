@@ -1,10 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Calendar, MessageSquare, DollarSign } from "lucide-react";
+import { Home, Calendar, MessageSquare, DollarSign, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 
 const Navigation = () => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
   
   const links = [
     { to: "/", icon: Home, label: "Home" },
@@ -21,7 +24,7 @@ const Navigation = () => {
             <img src={logo} alt="Pairent Logo" className="h-10" />
           </Link>
           
-          <div className="hidden md:flex space-x-1">
+          <div className="hidden md:flex space-x-1 items-center">
             {links.map((link) => {
               const Icon = link.icon;
               const isActive = location.pathname === link.to;
@@ -42,6 +45,17 @@ const Navigation = () => {
                 </Link>
               );
             })}
+            {user && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={signOut}
+                className="gap-2 ml-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </Button>
+            )}
           </div>
         </div>
       </div>
