@@ -11,7 +11,7 @@ import CalendarPage from "./pages/CalendarPage";
 import MessagesPage from "./pages/MessagesPage";
 import PaymentsPage from "./pages/PaymentsPage";
 import MemoryJournal from "./pages/MemoryJournal";
-import ProfilePage from "./pages/ProfilePage";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,7 +31,7 @@ const App = () => (
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/payments" element={<PaymentsPage />} />
             <Route path="/memory-journal" element={<MemoryJournal />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

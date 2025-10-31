@@ -26,10 +26,10 @@ export const useProfile = () => {
         .from("profiles")
         .select("*")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
-      return data as Profile | null;
+      return data as Profile;
     },
   });
 
