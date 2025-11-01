@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Calendar, MessageSquare, DollarSign, BookHeart, User, LogOut } from "lucide-react";
+import { Home, Calendar, MessageSquare, DollarSign, BookHeart, User, LogOut, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ const Navigation = () => {
     { to: "/messages", icon: MessageSquare, label: "Messages" },
     { to: "/payments", icon: DollarSign, label: "Payments" },
     { to: "/memory-journal", icon: BookHeart, label: "Memory" },
+    { to: "/ai-assistant", icon: Bot, label: "AI Assistant" },
     { to: "/profile", icon: User, label: "Profile" },
   ];
 
