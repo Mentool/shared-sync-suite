@@ -12,7 +12,7 @@ import { Loader2, User } from "lucide-react";
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { profile, isLoading, updateProfile } = useProfile();
+  const { profile, isLoading, updateProfile, isUpdating } = useProfile();
   
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -32,9 +32,12 @@ const ProfilePage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const trimmedName = fullName.trim();
+    const trimmedPhone = phone.trim();
+
     updateProfile({
-      full_name: fullName,
-      phone: phone,
+      full_name: trimmedName || null,
+      phone: trimmedPhone || null,
     });
   };
 
@@ -102,8 +105,8 @@ const ProfilePage = () => {
                   />
                 </div>
 
-                <Button type="submit" className="w-full" variant="warm">
-                  Save Changes
+                <Button type="submit" className="w-full" variant="warm" disabled={isUpdating}>
+                  {isUpdating ? "Saving..." : "Save Changes"}
                 </Button>
               </form>
             </CardContent>

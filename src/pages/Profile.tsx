@@ -13,7 +13,7 @@ import { User, Mail, Phone, Save } from "lucide-react";
 const Profile = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { profile, isLoading, updateProfile } = useProfile();
+  const { profile, isLoading, updateProfile, isUpdating } = useProfile();
   
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -32,9 +32,12 @@ const Profile = () => {
   }, [profile]);
 
   const handleSave = () => {
+    const trimmedName = fullName.trim();
+    const trimmedPhone = phone.trim();
+
     updateProfile({
-      full_name: fullName,
-      phone: phone,
+      full_name: trimmedName || null,
+      phone: trimmedPhone || null,
     });
   };
 
@@ -119,13 +122,14 @@ const Profile = () => {
               />
             </div>
 
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               className="w-full"
               variant="warm"
+              disabled={isUpdating}
             >
               <Save className="w-4 h-4 mr-2" />
-              Save Changes
+              {isUpdating ? "Saving..." : "Save Changes"}
             </Button>
           </CardContent>
         </Card>

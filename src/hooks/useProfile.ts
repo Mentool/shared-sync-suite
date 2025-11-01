@@ -19,23 +19,45 @@ export const useProfile = () => {
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) throw new Error("Not authenticated");
 
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data as Profile;
+
+      if (data) {
+        return data as Profile;
+      }
+
+      const { data: createdProfile, error: insertError } = await supabase
+        .from("profiles")
+        .insert({
+          user_id: user.id,
+          email: user.email ?? null,
+          full_name: user.user_metadata?.full_name || user.email || null,
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      return createdProfile as Profile;
     },
   });
 
   const updateProfile = useMutation({
     mutationFn: async (updates: Partial<Profile>) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
       const { data, error } = await supabase
@@ -61,5 +83,6 @@ export const useProfile = () => {
     profile,
     isLoading,
     updateProfile: updateProfile.mutate,
+    isUpdating: updateProfile.isPending,
   };
 };
