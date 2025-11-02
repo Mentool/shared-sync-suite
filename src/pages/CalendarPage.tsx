@@ -2,6 +2,7 @@ import Navigation from "@/components/Navigation";
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import AddEventDialog from "@/components/AddEventDialog";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -50,48 +51,56 @@ const CalendarPage = () => {
           
           <div className="space-y-6">
             <Card className="p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Upcoming Events</h2>
-              {isLoading ? (
-                <div className="text-center py-8 text-muted-foreground">Loading events...</div>
-              ) : events.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No events yet. Add your first event to get started!
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {events.map((event) => (
-                    <div key={event.id} className="p-4 rounded-lg bg-gradient-to-r from-muted/50 to-muted/30 border border-border group">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-foreground">{event.title}</h3>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-xs px-2 py-1 rounded-full ${getEventTypeColor(event.type)}`}>
-                            {event.type}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => deleteEvent.mutate(event.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        </div>
+              <Accordion type="single" collapsible defaultValue="upcoming-events">
+                <AccordionItem value="upcoming-events" className="border-none">
+                  <AccordionTrigger className="text-xl font-semibold text-foreground hover:no-underline py-0 mb-4">
+                    Upcoming Events
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    {isLoading ? (
+                      <div className="text-center py-8 text-muted-foreground">Loading events...</div>
+                    ) : events.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No events yet. Add your first event to get started!
                       </div>
-                      {event.event_time && (
-                        <p className="text-sm text-muted-foreground">
-                          {format(parseISO(`2000-01-01T${event.event_time}`), "h:mm a")}
-                        </p>
-                      )}
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {format(parseISO(event.event_date), "MMMM d, yyyy")}
-                      </p>
-                      {event.description && (
-                        <p className="text-sm text-muted-foreground mt-2">{event.description}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ) : (
+                      <div className="space-y-3">
+                        {events.map((event) => (
+                          <div key={event.id} className="p-4 rounded-lg bg-gradient-to-r from-muted/50 to-muted/30 border border-border group">
+                            <div className="flex items-start justify-between mb-2">
+                              <h3 className="font-semibold text-foreground">{event.title}</h3>
+                              <div className="flex items-center gap-2">
+                                <span className={`text-xs px-2 py-1 rounded-full ${getEventTypeColor(event.type)}`}>
+                                  {event.type}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => deleteEvent.mutate(event.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </div>
+                            {event.event_time && (
+                              <p className="text-sm text-muted-foreground">
+                                {format(parseISO(`2000-01-01T${event.event_time}`), "h:mm a")}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {format(parseISO(event.event_date), "MMMM d, yyyy")}
+                            </p>
+                            {event.description && (
+                              <p className="text-sm text-muted-foreground mt-2">{event.description}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </Card>
             
             <Card className="p-6 bg-gradient-warm text-white">
