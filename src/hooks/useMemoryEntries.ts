@@ -18,23 +18,25 @@ export interface MemoryEntry {
 export const useMemoryEntries = (childId?: string) => {
   const queryClient = useQueryClient();
 
-  const { data: entries, isLoading } = useQuery({
+  const shouldFetch = Boolean(childId);
+
+  const { data: entries = [], isLoading } = useQuery<MemoryEntry[]>({
     queryKey: ["memory-entries", childId],
     queryFn: async () => {
-      let query = supabase
-        .from("memory_entries")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (childId) {
-        query = query.eq("child_id", childId);
+      if (!childId) {
+        return [];
       }
 
-      const { data, error } = await query;
+      const { data, error } = await supabase
+        .from("memory_entries")
+        .select("*")
+        .eq("child_id", childId)
+        .order("created_at", { ascending: false });
+
       if (error) throw error;
       return data as MemoryEntry[];
     },
-    enabled: !!childId || childId === undefined,
+    enabled: shouldFetch,
   });
 
   const addEntry = useMutation({

@@ -45,8 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     try {
       const redirectUrl = `${window.location.origin}/dashboard`;
-      
-      const { error } = await supabase.auth.signUp({
+
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -58,8 +58,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { error };
       }
 
-      toast.success("Account created successfully!");
-      navigate("/dashboard");
+      if (data.session) {
+        toast.success("Account created successfully!");
+        navigate("/dashboard");
+      } else {
+        toast.success("Account created! Check your email to confirm before signing in.");
+      }
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };

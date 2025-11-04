@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ const paymentSchema = z.object({
     .max(200, { message: "Description must be less than 200 characters" }),
 });
 
-const PaymentForm = () => {
+const PaymentForm = forwardRef<HTMLFormElement>((_props, ref) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState<{ amount?: string; description?: string }>({});
@@ -61,11 +61,12 @@ const PaymentForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form ref={ref} onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="amount">Amount</Label>
         <Input
           id="amount"
+          name="amount"
           type="number"
           step="0.01"
           placeholder="0.00"
@@ -105,6 +106,8 @@ const PaymentForm = () => {
       </Button>
     </form>
   );
-};
+});
+
+PaymentForm.displayName = "PaymentForm";
 
 export default PaymentForm;
