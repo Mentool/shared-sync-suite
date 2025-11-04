@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -27,13 +28,62 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/messages" element={<MessagesPage />} />
-            <Route path="/payments" element={<PaymentsPage />} />
-            <Route path="/memory-journal" element={<MemoryJournal />} />
-            <Route path="/ai-assistant" element={<AIAssistant />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/calendar"
+              element={
+                <ProtectedRoute>
+                  <CalendarPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/messages"
+              element={
+                <ProtectedRoute>
+                  <MessagesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payments"
+              element={
+                <ProtectedRoute>
+                  <PaymentsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/memory-journal"
+              element={
+                <ProtectedRoute>
+                  <MemoryJournal />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ai-assistant"
+              element={
+                <ProtectedRoute>
+                  <AIAssistant />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
