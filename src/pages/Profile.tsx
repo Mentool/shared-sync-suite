@@ -39,9 +39,9 @@ const Profile = () => {
     });
   };
 
-  if (authLoading || isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+    if (authLoading || isLoading) {
+      return (
+        <div className="min-h-[100dvh] bg-background flex items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
       </div>
     );
@@ -59,8 +59,8 @@ const Profile = () => {
     return user?.email?.[0]?.toUpperCase() || "U";
   };
 
-  return (
-    <div className="min-h-screen bg-background">
+    return (
+      <div className="min-h-[100dvh] bg-background pb-safe-with-nav md:pb-0">
       <Navigation />
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <Card className="border-warm-accent/20">

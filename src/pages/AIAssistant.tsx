@@ -131,7 +131,7 @@ const AIAssistant = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-background via-background to-accent/5 pb-safe-with-nav md:pb-0">
       <Navigation />
       
       <main className="container mx-auto px-4 py-8 max-w-4xl">
