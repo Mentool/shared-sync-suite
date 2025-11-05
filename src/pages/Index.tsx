@@ -5,7 +5,7 @@ import logo from "@/assets/logo.png";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background pb-safe-with-nav md:pb-0">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-subtle" />

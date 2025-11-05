@@ -38,16 +38,16 @@ const ProfilePage = () => {
     });
   };
 
-  if (authLoading || isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+    if (authLoading || isLoading) {
+      return (
+        <div className="min-h-[100dvh] bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background">
+    return (
+      <div className="min-h-[100dvh] bg-background pb-safe-with-nav md:pb-0">
       <Navigation />
       
       <div className="container mx-auto px-4 pt-24 pb-8">

@@ -29,10 +29,10 @@ const MessagesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <Navigation />
-      
-      <main className="h-[calc(100vh-128px)] md:h-[calc(100vh-64px)] flex flex-col px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
+
+      <main className="min-h-[calc(100dvh-8rem)] md:min-h-[calc(100dvh-4rem)] flex flex-col px-4 sm:px-6 lg:px-8 py-4 pb-safe-with-nav max-w-6xl mx-auto">
         <div className="mb-4">
           <h1 className="text-2xl font-bold text-foreground mb-1">Messages</h1>
           <p className="text-sm text-muted-foreground">Communicate with your co-parent</p>
