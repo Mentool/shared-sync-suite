@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Mail, Phone, Save } from "lucide-react";
+import { PushNotificationToggle } from "@/components/PushNotificationToggle";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -129,6 +130,8 @@ const Profile = () => {
             </Button>
           </CardContent>
         </Card>
+
+        <PushNotificationToggle />
       </main>
     </div>
   );
