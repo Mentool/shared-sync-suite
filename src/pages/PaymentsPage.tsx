@@ -1,15 +1,23 @@
 import Navigation from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { Plus, ArrowUpRight, ArrowDownLeft, Pencil } from "lucide-react";
 import PaymentForm from "@/components/PaymentForm";
 import ExportPayments from "@/components/ExportPayments";
-import { usePayments } from "@/hooks/usePayments";
-import { useMemo } from "react";
+import EditPaymentDialog from "@/components/EditPaymentDialog";
+import { usePayments, Payment } from "@/hooks/usePayments";
+import { useMemo, useState } from "react";
 import { format } from "date-fns";
 
 const PaymentsPage = () => {
   const { data: payments = [], isLoading } = usePayments();
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const handleEditClick = (payment: Payment) => {
+    setEditingPayment(payment);
+    setIsEditDialogOpen(true);
+  };
 
   const totals = useMemo(() => {
     const sent = payments
@@ -82,11 +90,11 @@ const PaymentsPage = () => {
             ) : (
               <div className="space-y-3">
                 {payments.map((payment) => (
-                  <div
+                <div
                     key={payment.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border border-border hover:bg-muted transition-colors"
+                    className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border border-border hover:bg-muted transition-colors group"
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-1">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                         payment.type === "sent"
                           ? "bg-primary/10 text-primary"
@@ -98,20 +106,30 @@ const PaymentsPage = () => {
                           <ArrowDownLeft className="w-5 h-5" />
                         )}
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <p className="font-semibold text-foreground">{payment.description}</p>
                         <p className="text-sm text-muted-foreground">
                           {format(new Date(payment.created_at), "MMM d, yyyy 'at' h:mm a")}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className={`font-semibold ${
-                        payment.type === "sent" ? "text-primary" : "text-secondary"
-                      }`}>
-                        {payment.type === "sent" ? "-" : "+"}${Number(payment.amount).toFixed(2)}
-                      </p>
-                      <p className="text-xs text-muted-foreground capitalize">{payment.status}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className={`font-semibold ${
+                          payment.type === "sent" ? "text-primary" : "text-secondary"
+                        }`}>
+                          {payment.type === "sent" ? "-" : "+"}${Number(payment.amount).toFixed(2)}
+                        </p>
+                        <p className="text-xs text-muted-foreground capitalize">{payment.status}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleEditClick(payment)}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -131,6 +149,12 @@ const PaymentsPage = () => {
           </Card>
         </div>
       </main>
+
+      <EditPaymentDialog
+        payment={editingPayment}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+      />
     </div>
   );
 };

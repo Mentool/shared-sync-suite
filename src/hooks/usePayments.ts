@@ -63,3 +63,42 @@ export const useSendPayment = () => {
     },
   });
 };
+
+export const useUpdatePayment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      id, 
+      amount, 
+      description, 
+      type 
+    }: { 
+      id: string; 
+      amount: number; 
+      description: string; 
+      type: "sent" | "received";
+    }) => {
+      const { data, error } = await supabase
+        .from("payments")
+        .update({
+          amount,
+          description,
+          type,
+        })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      toast.success("Payment updated successfully!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update payment");
+    },
+  });
+};
