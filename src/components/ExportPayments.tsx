@@ -72,12 +72,22 @@ const ExportPayments = ({ payments, totals }: ExportPaymentsProps) => {
     const rows = payments.map((payment) => {
       const date = format(new Date(payment.created_at), "yyyy-MM-dd HH:mm:ss");
       const type = payment.type;
-      const amount = Number(payment.amount).toFixed(2);
+      const rawAmount = Number(payment.amount);
+      const signedAmount = type === "sent" ? -Math.abs(rawAmount) : Math.abs(rawAmount);
+      const amount = signedAmount.toFixed(2);
       const description = `"${payment.description.replace(/"/g, '""')}"`;
       const status = payment.status;
       
       return [date, type, amount, description, status].join(",");
     });
+
+    const balanceValue = Number(totals.balance.toFixed(2));
+    const formattedBalance =
+      balanceValue === 0
+        ? "0.00"
+        : balanceValue > 0
+        ? `+${balanceValue.toFixed(2)}`
+        : balanceValue.toFixed(2);
 
     // Add summary at the end
     const summary = [
@@ -85,7 +95,7 @@ const ExportPayments = ({ payments, totals }: ExportPaymentsProps) => {
       "SUMMARY",
       `Total Sent,${totals.sent.toFixed(2)}`,
       `Total Received,${totals.received.toFixed(2)}`,
-      `Balance,${totals.balance.toFixed(2)}`,
+      `Balance,${formattedBalance}`,
     ];
 
     const csvContent = [headers.join(","), ...rows, ...summary].join("\n");
