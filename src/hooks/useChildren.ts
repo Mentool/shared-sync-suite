@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "./useAuth";
 
 export interface Child {
   id: string;
@@ -13,13 +14,20 @@ export interface Child {
 
 export const useChildren = () => {
   const queryClient = useQueryClient();
+  const { user, loading: authLoading } = useAuth();
 
-  const { data: children, isLoading } = useQuery({
-    queryKey: ["children"],
+  const {
+    data: children,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["children", user?.id],
+    enabled: !authLoading && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("children")
         .select("*")
+        .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -29,7 +37,6 @@ export const useChildren = () => {
 
   const addChild = useMutation({
     mutationFn: async (child: { name: string; date_of_birth?: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
       const { data, error } = await supabase
@@ -42,7 +49,7 @@ export const useChildren = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["children"] });
+      queryClient.invalidateQueries({ queryKey: ["children", user?.id] });
       toast.success("Child added successfully");
     },
     onError: (error) => {
@@ -51,8 +58,10 @@ export const useChildren = () => {
   });
 
   return {
-    children,
-    isLoading,
+    children: children ?? [],
+    isLoading: authLoading || isLoading,
+    error,
     addChild: addChild.mutate,
+    isAdding: addChild.isPending,
   };
 };

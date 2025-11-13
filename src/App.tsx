@@ -14,6 +14,7 @@ import MemoryJournal from "./pages/MemoryJournal";
 import Profile from "./pages/Profile";
 import AIAssistant from "./pages/AIAssistant";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -27,13 +28,62 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/messages" element={<MessagesPage />} />
-            <Route path="/payments" element={<PaymentsPage />} />
-            <Route path="/memory-journal" element={<MemoryJournal />} />
-            <Route path="/ai-assistant" element={<AIAssistant />} />
-            <Route path="/profile" element={<Profile />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/calendar"
+                element={
+                  <ProtectedRoute>
+                    <CalendarPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/messages"
+                element={
+                  <ProtectedRoute>
+                    <MessagesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/payments"
+                element={
+                  <ProtectedRoute>
+                    <PaymentsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/memory-journal"
+                element={
+                  <ProtectedRoute>
+                    <MemoryJournal />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai-assistant"
+                element={
+                  <ProtectedRoute>
+                    <AIAssistant />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

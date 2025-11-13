@@ -61,16 +61,16 @@ export const usePushNotifications = () => {
       });
 
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
 
-      // Save subscription to database
-      const { error } = await supabase
-        .from('push_subscriptions')
-        .insert([{
-          user_id: user.id,
-          subscription: subscription.toJSON() as any,
-        }]);
+        const subscriptionPayload: PushSubscriptionJSON = subscription.toJSON();
+
+        const { error } = await supabase
+          .from('push_subscriptions')
+          .insert([{ user_id: user.id, subscription: subscriptionPayload }]);
 
       if (error) throw error;
 
@@ -125,9 +125,9 @@ export const usePushNotifications = () => {
 // Helper function to convert VAPID key
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding)
-    .replace(/\-/g, '+')
-    .replace(/_/g, '/');
+    const base64 = (base64String + padding)
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
 
   const rawData = window.atob(base64);
   const outputArray = new Uint8Array(rawData.length);

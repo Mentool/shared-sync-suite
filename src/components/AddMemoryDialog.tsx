@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,7 +38,9 @@ export const AddMemoryDialog = ({ childId }: AddMemoryDialogProps) => {
       let imageUrl: string | undefined;
 
       if (file && entryType === "photo") {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) throw new Error("Not authenticated");
         imageUrl = await uploadPhoto(file, user.id);
       }
@@ -57,8 +65,9 @@ export const AddMemoryDialog = ({ childId }: AddMemoryDialogProps) => {
           },
         }
       );
-    } catch (error: any) {
-      toast.error("Failed to upload photo: " + error.message);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error("Failed to upload photo: " + message);
     } finally {
       setUploading(false);
     }
@@ -79,7 +88,10 @@ export const AddMemoryDialog = ({ childId }: AddMemoryDialogProps) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="entryType">Type *</Label>
-            <Select value={entryType} onValueChange={(value: any) => setEntryType(value)}>
+            <Select
+              value={entryType}
+              onValueChange={(value) => setEntryType(value as "note" | "photo" | "milestone")}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "./useAuth";
 
 export interface CalendarEvent {
   id: string;
@@ -18,12 +19,16 @@ export interface CalendarEvent {
 }
 
 export const useCalendarEvents = () => {
+  const { user, loading: authLoading } = useAuth();
+
   return useQuery({
-    queryKey: ["calendar_events"],
+    queryKey: ["calendar_events", user?.id],
+    enabled: !authLoading && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("calendar_events")
         .select("*")
+        .eq("user_id", user!.id)
         .order("event_date", { ascending: true });
 
       if (error) throw error;
@@ -34,6 +39,7 @@ export const useCalendarEvents = () => {
 
 export const useAddCalendarEvent = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (event: {
@@ -45,8 +51,6 @@ export const useAddCalendarEvent = () => {
       recurrence_pattern?: CalendarEvent["recurrence_pattern"];
       recurrence_end_date?: string;
     }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
       if (!user) {
         throw new Error("You must be logged in to add events");
       }
@@ -85,7 +89,7 @@ export const useAddCalendarEvent = () => {
       return mainEvent;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["calendar_events"] });
+        queryClient.invalidateQueries({ queryKey: ["calendar_events", user?.id] });
       toast.success("Event added successfully!");
     },
     onError: (error: Error) => {
@@ -111,7 +115,7 @@ const generateRecurringEvents = (
   const events = [];
   const startDate = new Date(parentEvent.event_date);
   const end = new Date(endDate);
-  let currentDate = new Date(startDate);
+  const currentDate = new Date(startDate);
 
   // Move to next occurrence based on pattern
   switch (parentEvent.recurrence_pattern) {
@@ -163,6 +167,7 @@ const generateRecurringEvents = (
 
 export const useDeleteCalendarEvent = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (eventId: string) => {
@@ -174,7 +179,7 @@ export const useDeleteCalendarEvent = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["calendar_events"] });
+      queryClient.invalidateQueries({ queryKey: ["calendar_events", user?.id] });
       toast.success("Event deleted successfully!");
     },
     onError: (error: Error) => {

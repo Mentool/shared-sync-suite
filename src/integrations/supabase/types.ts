@@ -140,7 +140,34 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
+        }
+        messages: {
+          Row: {
+            content: string
+            created_at: string
+            direction: "sent" | "received"
+            id: string
+            updated_at: string
+            user_id: string
+          }
+          Insert: {
+            content: string
+            created_at?: string
+            direction: "sent" | "received"
+            id?: string
+            updated_at?: string
+            user_id: string
+          }
+          Update: {
+            content?: string
+            created_at?: string
+            direction?: "sent" | "received"
+            id?: string
+            updated_at?: string
+            user_id?: string
+          }
+          Relationships: []
+        }
       payments: {
         Row: {
           amount: number
