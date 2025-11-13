@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "./useAuth";
 
 export interface Payment {
   id: string;
@@ -14,27 +15,47 @@ export interface Payment {
 }
 
 export const usePayments = () => {
-  return useQuery({
-    queryKey: ["payments"],
+  const { user, loading: authLoading } = useAuth();
+
+  const query = useQuery({
+    queryKey: ["payments", user?.id],
+    enabled: !authLoading && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("payments")
         .select("*")
+        .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as Payment[];
     },
   });
+
+  return {
+    payments: query.data ?? [],
+    isLoading: authLoading || query.isLoading,
+    error: query.error,
+    refetch: query.refetch,
+  };
 };
 
 export const useSendPayment = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ amount, description }: { amount: number; description: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+    mutationFn: async ({
+      amount,
+      description,
+      type,
+      status,
+    }: {
+      amount: number;
+      description: string;
+      type: Payment["type"];
+      status: Payment["status"];
+    }) => {
       if (!user) {
         throw new Error("You must be logged in to send payments");
       }
@@ -45,8 +66,8 @@ export const useSendPayment = () => {
           user_id: user.id,
           amount,
           description,
-          type: "sent",
-          status: "completed",
+          type,
+          status,
         })
         .select()
         .single();
@@ -55,7 +76,7 @@ export const useSendPayment = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+        queryClient.invalidateQueries({ queryKey: ["payments", user?.id] });
       toast.success("Payment sent successfully!");
     },
     onError: (error: Error) => {
@@ -66,18 +87,21 @@ export const useSendPayment = () => {
 
 export const useUpdatePayment = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async ({ 
       id, 
       amount, 
       description, 
-      type 
+      type,
+      status,
     }: { 
       id: string; 
       amount: number; 
       description: string; 
       type: "sent" | "received";
+      status: "pending" | "completed" | "failed";
     }) => {
       const { data, error } = await supabase
         .from("payments")
@@ -85,6 +109,7 @@ export const useUpdatePayment = () => {
           amount,
           description,
           type,
+          status,
         })
         .eq("id", id)
         .select()
@@ -94,7 +119,7 @@ export const useUpdatePayment = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["payments", user?.id] });
       toast.success("Payment updated successfully!");
     },
     onError: (error: Error) => {

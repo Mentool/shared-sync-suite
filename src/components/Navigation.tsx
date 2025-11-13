@@ -1,5 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Calendar, MessageSquare, DollarSign, BookHeart, User, LogOut, Bot } from "lucide-react";
+import {
+  Home,
+  LayoutDashboard,
+  Calendar,
+  MessageSquare,
+  DollarSign,
+  BookHeart,
+  User,
+  LogOut,
+  Bot,
+  LogIn,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -10,14 +21,21 @@ const Navigation = () => {
   const { user, signOut } = useAuth();
   
   const links = [
-    { to: "/", icon: Home, label: "Home" },
-    { to: "/calendar", icon: Calendar, label: "Calendar" },
-    { to: "/messages", icon: MessageSquare, label: "Messages" },
-    { to: "/payments", icon: DollarSign, label: "Payments" },
-    { to: "/memory-journal", icon: BookHeart, label: "Memory" },
-    { to: "/ai-assistant", icon: Bot, label: "AI Assistant" },
-    { to: "/profile", icon: User, label: "Profile" },
+    { to: "/", icon: Home, label: "Home", requiresAuth: false, hideWhenAuthenticated: true },
+    { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", requiresAuth: true },
+    { to: "/calendar", icon: Calendar, label: "Calendar", requiresAuth: true },
+    { to: "/messages", icon: MessageSquare, label: "Messages", requiresAuth: true },
+    { to: "/payments", icon: DollarSign, label: "Payments", requiresAuth: true },
+    { to: "/memory-journal", icon: BookHeart, label: "Memory", requiresAuth: true },
+    { to: "/ai-assistant", icon: Bot, label: "AI Assistant", requiresAuth: true },
+    { to: "/profile", icon: User, label: "Profile", requiresAuth: true },
   ];
+
+  const filteredLinks = links.filter((link) => {
+    if (link.requiresAuth && !user) return false;
+    if (link.hideWhenAuthenticated && user) return false;
+    return true;
+  });
 
   return (
     <nav className="bg-card border-b border-border shadow-card sticky top-0 z-50">
@@ -28,7 +46,7 @@ const Navigation = () => {
           </Link>
           
           <div className="hidden md:flex space-x-1 items-center">
-            {links.map((link) => {
+            {filteredLinks.map((link) => {
               const Icon = link.icon;
               const isActive = location.pathname === link.to;
               
@@ -48,7 +66,7 @@ const Navigation = () => {
                 </Link>
               );
             })}
-            {user && (
+            {user ? (
               <Button
                 variant="ghost"
                 size="sm"
@@ -58,36 +76,59 @@ const Navigation = () => {
                 <LogOut className="w-4 h-4" />
                 Sign Out
               </Button>
+            ) : (
+              <Link to="/auth">
+                <Button variant="warm" size="sm" className="gap-2 ml-2">
+                  <LogIn className="w-4 h-4" />
+                  Sign In
+                </Button>
+              </Link>
             )}
           </div>
         </div>
       </div>
       
       {/* Mobile Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-card z-50">
-        <div className="grid grid-cols-6 gap-1 h-16 px-1">
-          {links.filter(link => link.to !== "/").map((link) => {
-            const Icon = link.icon;
-            const isActive = location.pathname === link.to;
-            
-            return (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 rounded-lg transition-all duration-300",
-                  isActive
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                )}
-              >
-                <Icon className={cn("w-5 h-5", isActive && "scale-110")} />
-                <span className="text-[10px] font-medium leading-tight">{link.label === "AI Assistant" ? "AI" : link.label}</span>
-              </Link>
-            );
-          })}
+      {user && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-card z-50">
+          <div className="grid grid-cols-6 gap-1 h-16 px-1">
+            {links
+              .filter((link) => link.requiresAuth && link.to !== "/profile")
+              .map((link) => {
+                const Icon = link.icon;
+                const isActive = location.pathname === link.to;
+                
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-0.5 rounded-lg transition-all duration-300",
+                      isActive
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    <Icon className={cn("w-5 h-5", isActive && "scale-110")} />
+                    <span className="text-[10px] font-medium leading-tight">
+                      {link.label === "AI Assistant" ? "AI" : link.label}
+                    </span>
+                  </Link>
+                );
+              })}
+            <button
+              type="button"
+              onClick={signOut}
+              className={cn(
+                "flex flex-col items-center justify-center gap-0.5 rounded-lg transition-all duration-300 text-muted-foreground"
+              )}
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-[10px] font-medium leading-tight">Sign Out</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };

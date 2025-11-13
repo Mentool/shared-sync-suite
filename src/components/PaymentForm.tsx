@@ -1,9 +1,16 @@
 import { useState } from "react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useSendPayment } from "@/hooks/usePayments";
-import { z } from "zod";
 
 const paymentSchema = z.object({
   amount: z
@@ -15,49 +22,54 @@ const paymentSchema = z.object({
     .trim()
     .min(1, { message: "Description is required" })
     .max(200, { message: "Description must be less than 200 characters" }),
+  type: z.enum(["sent", "received"]),
+  status: z.enum(["pending", "completed", "failed"]),
 });
 
-const PaymentForm = () => {
+interface PaymentFormProps {
+  onSuccess?: () => void;
+}
+
+const PaymentForm = ({ onSuccess }: PaymentFormProps) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [errors, setErrors] = useState<{ amount?: string; description?: string }>({});
-  
+  const [type, setType] = useState<"sent" | "received">("sent");
+  const [status, setStatus] = useState<"pending" | "completed" | "failed">("completed");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const sendPayment = useSendPayment();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
-    // Parse and validate input
-    const amountNum = parseFloat(amount);
-    
-    const result = paymentSchema.safeParse({
-      amount: amountNum,
+    const parsed = paymentSchema.safeParse({
+      amount: Number(amount),
       description,
+      type,
+      status,
     });
 
-    if (!result.success) {
-      const fieldErrors: { amount?: string; description?: string } = {};
-      result.error.errors.forEach((error) => {
-        if (error.path[0] === "amount") {
-          fieldErrors.amount = error.message;
-        } else if (error.path[0] === "description") {
-          fieldErrors.description = error.message;
+    if (!parsed.success) {
+      const fieldErrors: Record<string, string> = {};
+      parsed.error.errors.forEach((error) => {
+        if (error.path[0]) {
+          fieldErrors[error.path[0].toString()] = error.message;
         }
       });
       setErrors(fieldErrors);
       return;
     }
 
-    sendPayment.mutate(
-      { amount: amountNum, description },
-      {
-        onSuccess: () => {
-          setAmount("");
-          setDescription("");
-        },
-      }
-    );
+    sendPayment.mutate(parsed.data, {
+      onSuccess: () => {
+        setAmount("");
+        setDescription("");
+        setType("sent");
+        setStatus("completed");
+        onSuccess?.();
+      },
+    });
   };
 
   return (
@@ -74,11 +86,9 @@ const PaymentForm = () => {
           className="mt-1"
           disabled={sendPayment.isPending}
         />
-        {errors.amount && (
-          <p className="text-sm text-destructive mt-1">{errors.amount}</p>
-        )}
+        {errors.amount && <p className="text-sm text-destructive mt-1">{errors.amount}</p>}
       </div>
-      
+
       <div>
         <Label htmlFor="description">Description</Label>
         <Input
@@ -94,14 +104,53 @@ const PaymentForm = () => {
           <p className="text-sm text-destructive mt-1">{errors.description}</p>
         )}
       </div>
-      
-      <Button 
-        type="submit" 
-        variant="warm" 
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="payment-type">Payment Type</Label>
+          <Select
+            value={type}
+            onValueChange={(value) => setType(value as "sent" | "received")}
+            disabled={sendPayment.isPending}
+          >
+            <SelectTrigger id="payment-type" className="mt-1">
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sent">Sent (you paid)</SelectItem>
+              <SelectItem value="received">Received (you were paid)</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.type && <p className="text-sm text-destructive mt-1">{errors.type}</p>}
+        </div>
+
+        <div>
+          <Label htmlFor="payment-status">Status</Label>
+          <Select
+            value={status}
+            onValueChange={(value) => setStatus(value as "pending" | "completed" | "failed")}
+            disabled={sendPayment.isPending}
+          >
+            <SelectTrigger id="payment-status" className="mt-1">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.status && <p className="text-sm text-destructive mt-1">{errors.status}</p>}
+        </div>
+      </div>
+
+      <Button
+        type="submit"
+        variant="warm"
         className="w-full"
         disabled={sendPayment.isPending}
       >
-        {sendPayment.isPending ? "Sending..." : "Send Payment"}
+        {sendPayment.isPending ? "Saving..." : "Record Payment"}
       </Button>
     </form>
   );

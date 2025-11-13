@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "./useAuth";
 
 export interface MemoryEntry {
   id: string;
@@ -17,13 +18,20 @@ export interface MemoryEntry {
 
 export const useMemoryEntries = (childId?: string) => {
   const queryClient = useQueryClient();
+  const { user, loading: authLoading } = useAuth();
 
-  const { data: entries, isLoading } = useQuery({
-    queryKey: ["memory-entries", childId],
+  const {
+    data: entries,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["memory-entries", user?.id, childId ?? "all"],
+    enabled: !authLoading && !!user && (childId ? childId.length > 0 : true),
     queryFn: async () => {
       let query = supabase
         .from("memory_entries")
         .select("*")
+        .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
 
       if (childId) {
@@ -34,7 +42,6 @@ export const useMemoryEntries = (childId?: string) => {
       if (error) throw error;
       return data as MemoryEntry[];
     },
-    enabled: !!childId || childId === undefined,
   });
 
   const addEntry = useMutation({
@@ -46,7 +53,6 @@ export const useMemoryEntries = (childId?: string) => {
       image_url?: string;
       milestone_date?: string;
     }) => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
       const { data, error } = await supabase
@@ -59,7 +65,7 @@ export const useMemoryEntries = (childId?: string) => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["memory-entries"] });
+      queryClient.invalidateQueries({ queryKey: ["memory-entries", user?.id] });
       toast.success("Memory added successfully");
     },
     onError: (error) => {
@@ -77,7 +83,7 @@ export const useMemoryEntries = (childId?: string) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["memory-entries"] });
+      queryClient.invalidateQueries({ queryKey: ["memory-entries", user?.id] });
       toast.success("Memory deleted successfully");
     },
     onError: (error) => {
@@ -96,18 +102,21 @@ export const useMemoryEntries = (childId?: string) => {
 
     if (uploadError) throw uploadError;
 
-    const { data: { publicUrl } } = supabase.storage
-      .from("memory-photos")
-      .getPublicUrl(filePath);
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("memory-photos").getPublicUrl(filePath);
 
     return publicUrl;
   };
 
   return {
-    entries,
-    isLoading,
+    entries: entries ?? [],
+    isLoading: authLoading || isLoading,
+    error,
     addEntry: addEntry.mutate,
     deleteEntry: deleteEntry.mutate,
+    isAdding: addEntry.isPending,
+    isDeleting: deleteEntry.isPending,
     uploadPhoto,
   };
 };
