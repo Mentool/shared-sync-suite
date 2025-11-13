@@ -13,6 +13,7 @@ import PaymentsPage from "./pages/PaymentsPage";
 import MemoryJournal from "./pages/MemoryJournal";
 import Profile from "./pages/Profile";
 import AIAssistant from "./pages/AIAssistant";
+import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/memory-journal" element={<MemoryJournal />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/install" element={<Install />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
