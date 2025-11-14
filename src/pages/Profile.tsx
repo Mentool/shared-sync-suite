@@ -10,11 +10,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Mail, Phone, Save } from "lucide-react";
 import { PushNotificationToggle } from "@/components/PushNotificationToggle";
+import { AddConnectionDialog } from "@/components/AddConnectionDialog";
+import { useConnections } from "@/hooks/useConnections";
+import { Badge } from "@/components/ui/badge";
+import { UserPlus, Check, X, Trash2 } from "lucide-react";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { profile, isLoading, updateProfile } = useProfile();
+  const { connections, isLoading: connectionsLoading, updateConnectionStatus, deleteConnection } = useConnections();
   
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -128,6 +133,85 @@ const Profile = () => {
               <Save className="w-4 h-4 mr-2" />
               Save Changes
             </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-warm-accent/20">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Connected Users</CardTitle>
+                <CardDescription>Manage your co-parenting connections</CardDescription>
+              </div>
+              <AddConnectionDialog />
+            </div>
+          </CardHeader>
+          <CardContent>
+            {connectionsLoading ? (
+              <p className="text-muted-foreground">Loading connections...</p>
+            ) : connections && connections.length > 0 ? (
+              <div className="space-y-3">
+                {connections.map((connection) => {
+                  const isReceiver = connection.connected_user_id === user?.id;
+                  const displayUser = connection.connected_user;
+                  
+                  return (
+                    <div key={connection.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarFallback>
+                            {displayUser?.full_name?.[0]?.toUpperCase() || displayUser?.email?.[0]?.toUpperCase() || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">
+                            {displayUser?.full_name || displayUser?.email || "Unknown User"}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{displayUser?.email}</p>
+                        </div>
+                        <Badge variant={
+                          connection.status === 'accepted' ? 'default' : 
+                          connection.status === 'pending' ? 'secondary' : 
+                          'destructive'
+                        }>
+                          {connection.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        {connection.status === 'pending' && isReceiver && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateConnectionStatus({ id: connection.id, status: 'accepted' })}
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateConnectionStatus({ id: connection.id, status: 'rejected' })}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => deleteConnection(connection.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-muted-foreground">No connections yet. Add a connection to get started.</p>
+            )}
           </CardContent>
         </Card>
 

@@ -24,11 +24,11 @@ export const useConnections = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_connections")
         .select(`
           *,
-          connected_user:profiles!user_connections_connected_user_id_fkey(email, full_name)
+          connected_user:profiles(email, full_name)
         `)
         .or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
@@ -53,7 +53,7 @@ export const useConnections = () => {
       if (profileError) throw new Error("User not found");
       if (profile.user_id === user.id) throw new Error("Cannot connect to yourself");
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_connections")
         .insert([{ user_id: user.id, connected_user_id: profile.user_id }])
         .select()
@@ -73,7 +73,7 @@ export const useConnections = () => {
 
   const updateConnectionStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: 'accepted' | 'rejected' }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_connections")
         .update({ status })
         .eq("id", id)
@@ -94,7 +94,7 @@ export const useConnections = () => {
 
   const deleteConnection = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_connections")
         .delete()
         .eq("id", id);

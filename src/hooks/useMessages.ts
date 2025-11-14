@@ -20,11 +20,11 @@ export const useMessages = (otherUserId?: string) => {
     queryKey: ["messages", otherUserId],
     queryFn: async () => {
       if (!otherUserId) return [];
-
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("messages")
         .select("*")
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
@@ -65,7 +65,7 @@ export const useMessages = (otherUserId?: string) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("messages")
         .insert([{ sender_id: user.id, receiver_id: receiverId, content }])
         .select()
@@ -84,7 +84,7 @@ export const useMessages = (otherUserId?: string) => {
 
   const markAsRead = useMutation({
     mutationFn: async (messageId: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("messages")
         .update({ read: true })
         .eq("id", messageId);
