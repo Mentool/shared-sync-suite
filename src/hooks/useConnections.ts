@@ -48,9 +48,10 @@ export const useConnections = () => {
         .from("profiles")
         .select("user_id")
         .eq("email", email)
-        .single();
+        .maybeSingle();
 
-      if (profileError) throw new Error("User not found");
+      if (profileError) throw new Error("Error searching for user");
+      if (!profile) throw new Error("User not found with this email");
       if (profile.user_id === user.id) throw new Error("Cannot connect to yourself");
 
       const { data, error } = await (supabase as any)
