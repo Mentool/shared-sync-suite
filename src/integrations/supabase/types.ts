@@ -67,170 +67,257 @@ export type Database = {
           },
         ]
       }
-      children: {
-        Row: {
-          created_at: string
-          date_of_birth: string | null
-          id: string
-          name: string
-          updated_at: string
-          user_id: string
+        children: {
+          Row: {
+            created_at: string
+            date_of_birth: string | null
+            id: string
+            name: string
+            updated_at: string
+            user_id: string
+          }
+          Insert: {
+            created_at?: string
+            date_of_birth?: string | null
+            id?: string
+            name: string
+            updated_at?: string
+            user_id: string
+          }
+          Update: {
+            created_at?: string
+            date_of_birth?: string | null
+            id?: string
+            name?: string
+            updated_at?: string
+            user_id?: string
+          }
+          Relationships: []
         }
-        Insert: {
-          created_at?: string
-          date_of_birth?: string | null
-          id?: string
-          name: string
-          updated_at?: string
-          user_id: string
+        messages: {
+          Row: {
+            content: string
+            created_at: string
+            id: string
+            read: boolean
+            receiver_id: string
+            sender_id: string
+            updated_at: string
+          }
+          Insert: {
+            content: string
+            created_at?: string
+            id?: string
+            read?: boolean
+            receiver_id: string
+            sender_id: string
+            updated_at?: string
+          }
+          Update: {
+            content?: string
+            created_at?: string
+            id?: string
+            read?: boolean
+            receiver_id?: string
+            sender_id?: string
+            updated_at?: string
+          }
+          Relationships: [
+            {
+              foreignKeyName: "messages_receiver_id_profiles_fkey"
+              columns: ["receiver_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["user_id"]
+            },
+            {
+              foreignKeyName: "messages_sender_id_profiles_fkey"
+              columns: ["sender_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["user_id"]
+            },
+          ]
         }
-        Update: {
-          created_at?: string
-          date_of_birth?: string | null
-          id?: string
-          name?: string
-          updated_at?: string
-          user_id?: string
+        memory_entries: {
+          Row: {
+            child_id: string
+            content: string | null
+            created_at: string
+            entry_type: string
+            id: string
+            image_url: string | null
+            milestone_date: string | null
+            title: string
+            updated_at: string
+            user_id: string
+          }
+          Insert: {
+            child_id: string
+            content?: string | null
+            created_at?: string
+            entry_type: string
+            id?: string
+            image_url?: string | null
+            milestone_date?: string | null
+            title: string
+            updated_at?: string
+            user_id: string
+          }
+          Update: {
+            child_id?: string
+            content?: string | null
+            created_at?: string
+            entry_type?: string
+            id?: string
+            image_url?: string | null
+            milestone_date?: string | null
+            title?: string
+            updated_at?: string
+            user_id?: string
+          }
+          Relationships: [
+            {
+              foreignKeyName: "memory_entries_child_id_fkey"
+              columns: ["child_id"]
+              isOneToOne: false
+              referencedRelation: "children"
+              referencedColumns: ["id"]
+            },
+          ]
         }
-        Relationships: []
-      }
-      memory_entries: {
-        Row: {
-          child_id: string
-          content: string | null
-          created_at: string
-          entry_type: string
-          id: string
-          image_url: string | null
-          milestone_date: string | null
-          title: string
-          updated_at: string
-          user_id: string
+        payments: {
+          Row: {
+            amount: number
+            created_at: string
+            description: string
+            id: string
+            status: string
+            type: string
+            updated_at: string
+            user_id: string
+          }
+          Insert: {
+            amount: number
+            created_at?: string
+            description: string
+            id?: string
+            status?: string
+            type: string
+            updated_at?: string
+            user_id: string
+          }
+          Update: {
+            amount?: number
+            created_at?: string
+            description?: string
+            id?: string
+            status?: string
+            type?: string
+            updated_at?: string
+            user_id?: string
+          }
+          Relationships: []
         }
-        Insert: {
-          child_id: string
-          content?: string | null
-          created_at?: string
-          entry_type: string
-          id?: string
-          image_url?: string | null
-          milestone_date?: string | null
-          title: string
-          updated_at?: string
-          user_id: string
+        profiles: {
+          Row: {
+            avatar_url: string | null
+            created_at: string
+            email: string | null
+            full_name: string | null
+            id: string
+            phone: string | null
+            updated_at: string
+            user_id: string
+          }
+          Insert: {
+            avatar_url?: string | null
+            created_at?: string
+            email?: string | null
+            full_name?: string | null
+            id?: string
+            phone?: string | null
+            updated_at?: string
+            user_id: string
+          }
+          Update: {
+            avatar_url?: string | null
+            created_at?: string
+            email?: string | null
+            full_name?: string | null
+            id?: string
+            phone?: string | null
+            updated_at?: string
+            user_id?: string
+          }
+          Relationships: []
         }
-        Update: {
-          child_id?: string
-          content?: string | null
-          created_at?: string
-          entry_type?: string
-          id?: string
-          image_url?: string | null
-          milestone_date?: string | null
-          title?: string
-          updated_at?: string
-          user_id?: string
+        push_subscriptions: {
+          Row: {
+            created_at: string | null
+            id: string
+            subscription: Json
+            updated_at: string | null
+            user_id: string
+          }
+          Insert: {
+            created_at?: string | null
+            id?: string
+            subscription: Json
+            updated_at?: string | null
+            user_id: string
+          }
+          Update: {
+            created_at?: string | null
+            id?: string
+            subscription?: Json
+            updated_at?: string | null
+            user_id?: string
+          }
+          Relationships: []
         }
-        Relationships: [
-          {
-            foreignKeyName: "memory_entries_child_id_fkey"
-            columns: ["child_id"]
-            isOneToOne: false
-            referencedRelation: "children"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payments: {
-        Row: {
-          amount: number
-          created_at: string
-          description: string
-          id: string
-          status: string
-          type: string
-          updated_at: string
-          user_id: string
+        user_connections: {
+          Row: {
+            connected_user_id: string
+            created_at: string
+            id: string
+            status: string
+            updated_at: string
+            user_id: string
+          }
+          Insert: {
+            connected_user_id: string
+            created_at?: string
+            id?: string
+            status?: string
+            updated_at?: string
+            user_id: string
+          }
+          Update: {
+            connected_user_id?: string
+            created_at?: string
+            id?: string
+            status?: string
+            updated_at?: string
+            user_id?: string
+          }
+          Relationships: [
+            {
+              foreignKeyName: "user_connections_connected_user_id_profiles_fkey"
+              columns: ["connected_user_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["user_id"]
+            },
+            {
+              foreignKeyName: "user_connections_user_id_profiles_fkey"
+              columns: ["user_id"]
+              isOneToOne: false
+              referencedRelation: "profiles"
+              referencedColumns: ["user_id"]
+            },
+          ]
         }
-        Insert: {
-          amount: number
-          created_at?: string
-          description: string
-          id?: string
-          status?: string
-          type: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          description?: string
-          id?: string
-          status?: string
-          type?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string
-          email: string | null
-          full_name: string | null
-          id: string
-          phone: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          email?: string | null
-          full_name?: string | null
-          id?: string
-          phone?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string
-          email?: string | null
-          full_name?: string | null
-          id?: string
-          phone?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      push_subscriptions: {
-        Row: {
-          created_at: string | null
-          id: string
-          subscription: Json
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          subscription: Json
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          subscription?: Json
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never

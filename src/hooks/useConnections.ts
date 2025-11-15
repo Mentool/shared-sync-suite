@@ -2,17 +2,24 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+type ConnectionStatus = "pending" | "accepted" | "rejected";
+
+type ProfileSummary = {
+  user_id: string;
+  email: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+};
+
 export interface Connection {
   id: string;
   user_id: string;
   connected_user_id: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: ConnectionStatus;
   created_at: string;
   updated_at: string;
-  connected_user?: {
-    email: string;
-    full_name: string | null;
-  };
+  requester_profile?: ProfileSummary | null;
+  recipient_profile?: ProfileSummary | null;
 }
 
 export const useConnections = () => {
@@ -21,14 +28,17 @@ export const useConnections = () => {
   const { data: connections, isLoading } = useQuery({
     queryKey: ["connections"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("user_connections")
         .select(`
           *,
-          connected_user:profiles(email, full_name)
+          requester_profile:profiles!user_connections_user_id_profiles_fkey(user_id, email, full_name, avatar_url),
+          recipient_profile:profiles!user_connections_connected_user_id_profiles_fkey(user_id, email, full_name, avatar_url)
         `)
         .or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
@@ -40,10 +50,11 @@ export const useConnections = () => {
 
   const sendConnectionRequest = useMutation({
     mutationFn: async (email: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Find user by email
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("user_id")
@@ -54,7 +65,7 @@ export const useConnections = () => {
       if (!profile) throw new Error("User not found with this email");
       if (profile.user_id === user.id) throw new Error("Cannot connect to yourself");
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("user_connections")
         .insert([{ user_id: user.id, connected_user_id: profile.user_id }])
         .select()
@@ -73,8 +84,8 @@ export const useConnections = () => {
   });
 
   const updateConnectionStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: 'accepted' | 'rejected' }) => {
-      const { data, error } = await (supabase as any)
+    mutationFn: async ({ id, status }: { id: string; status: "accepted" | "rejected" }) => {
+      const { data, error } = await supabase
         .from("user_connections")
         .update({ status })
         .eq("id", id)
@@ -95,11 +106,7 @@ export const useConnections = () => {
 
   const deleteConnection = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any)
-        .from("user_connections")
-        .delete()
-        .eq("id", id);
-
+      const { error } = await supabase.from("user_connections").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {

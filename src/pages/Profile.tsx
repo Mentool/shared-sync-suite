@@ -151,63 +151,72 @@ const Profile = () => {
               <p className="text-muted-foreground">Loading connections...</p>
             ) : connections && connections.length > 0 ? (
               <div className="space-y-3">
-                {connections.map((connection) => {
-                  const isReceiver = connection.connected_user_id === user?.id;
-                  const displayUser = connection.connected_user;
-                  
-                  return (
-                    <div key={connection.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarFallback>
-                            {displayUser?.full_name?.[0]?.toUpperCase() || displayUser?.email?.[0]?.toUpperCase() || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">
-                            {displayUser?.full_name || displayUser?.email || "Unknown User"}
-                          </p>
-                          <p className="text-sm text-muted-foreground">{displayUser?.email}</p>
+                  {connections.map((connection) => {
+                    const isReceiver = connection.connected_user_id === user?.id;
+                    const displayProfile =
+                      connection.user_id === user?.id
+                        ? connection.recipient_profile
+                        : connection.requester_profile;
+                    const displayInitial =
+                      displayProfile?.full_name?.[0]?.toUpperCase() ||
+                      displayProfile?.email?.[0]?.toUpperCase() ||
+                      "U";
+                    const displayName =
+                      displayProfile?.full_name || displayProfile?.email || "Unknown User";
+
+                    return (
+                      <div key={connection.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarFallback>{displayInitial}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">{displayName}</p>
+                            <p className="text-sm text-muted-foreground">{displayProfile?.email}</p>
+                          </div>
+                          <Badge
+                            variant={
+                              connection.status === "accepted"
+                                ? "default"
+                                : connection.status === "pending"
+                                  ? "secondary"
+                                  : "destructive"
+                            }
+                          >
+                            {connection.status}
+                          </Badge>
                         </div>
-                        <Badge variant={
-                          connection.status === 'accepted' ? 'default' : 
-                          connection.status === 'pending' ? 'secondary' : 
-                          'destructive'
-                        }>
-                          {connection.status}
-                        </Badge>
+
+                        <div className="flex gap-2">
+                          {connection.status === "pending" && isReceiver && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updateConnectionStatus({ id: connection.id, status: "accepted" })}
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updateConnectionStatus({ id: connection.id, status: "rejected" })}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => deleteConnection(connection.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      
-                      <div className="flex gap-2">
-                        {connection.status === 'pending' && isReceiver && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateConnectionStatus({ id: connection.id, status: 'accepted' })}
-                            >
-                              <Check className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateConnectionStatus({ id: connection.id, status: 'rejected' })}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => deleteConnection(connection.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             ) : (
               <p className="text-muted-foreground">No connections yet. Add a connection to get started.</p>
