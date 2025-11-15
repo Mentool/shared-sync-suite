@@ -20,14 +20,18 @@ export const useMessages = (otherUserId?: string) => {
     queryKey: ["messages", otherUserId],
     queryFn: async () => {
       if (!otherUserId) return [];
-      
-      const { data: { user } } = await supabase.auth.getUser();
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("messages")
         .select("*")
-        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
+        .or(
+          `and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`
+        )
         .order("created_at", { ascending: true });
 
       if (error) throw error;
@@ -36,18 +40,17 @@ export const useMessages = (otherUserId?: string) => {
     enabled: !!otherUserId,
   });
 
-  // Set up realtime subscription
   useEffect(() => {
     if (!otherUserId) return;
 
     const channel = supabase
-      .channel('messages')
+      .channel(`messages-${otherUserId}`)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'messages'
+          event: "*",
+          schema: "public",
+          table: "messages",
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ["messages", otherUserId] });
@@ -62,10 +65,12 @@ export const useMessages = (otherUserId?: string) => {
 
   const sendMessage = useMutation({
     mutationFn: async ({ receiverId, content }: { receiverId: string; content: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("messages")
         .insert([{ sender_id: user.id, receiver_id: receiverId, content }])
         .select()
@@ -74,8 +79,8 @@ export const useMessages = (otherUserId?: string) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["messages", variables.receiverId] });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to send message");
@@ -84,15 +89,13 @@ export const useMessages = (otherUserId?: string) => {
 
   const markAsRead = useMutation({
     mutationFn: async (messageId: string) => {
-      const { error } = await (supabase as any)
-        .from("messages")
-        .update({ read: true })
-        .eq("id", messageId);
-
+      const { error } = await supabase.from("messages").update({ read: true }).eq("id", messageId);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      if (otherUserId) {
+        queryClient.invalidateQueries({ queryKey: ["messages", otherUserId] });
+      }
     },
   });
 
@@ -100,6 +103,8 @@ export const useMessages = (otherUserId?: string) => {
     messages,
     isLoading,
     sendMessage: sendMessage.mutate,
+    sendMessageAsync: sendMessage.mutateAsync,
+    isSending: sendMessage.isPending,
     markAsRead: markAsRead.mutate,
   };
 };
