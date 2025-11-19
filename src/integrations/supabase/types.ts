@@ -94,6 +94,39 @@ export type Database = {
         }
         Relationships: []
       }
+      favors: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          requester_id: string
+          responder_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          requester_id: string
+          responder_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          requester_id?: string
+          responder_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       memory_entries: {
         Row: {
           child_id: string
