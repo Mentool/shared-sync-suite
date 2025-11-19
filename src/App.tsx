@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import AIAssistant from "./pages/AIAssistant";
 import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
+import FavorsPage from "./pages/FavorsPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/favors" element={<FavorsPage />} />
             <Route path="/payments" element={<PaymentsPage />} />
             <Route path="/memory-journal" element={<MemoryJournal />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
