@@ -3,7 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useMessageListener } from "@/hooks/useMessageListener";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const MessagesPage = () => {
   const [message, setMessage] = useState("");
@@ -14,6 +17,19 @@ const MessagesPage = () => {
     { id: 4, sender: "me", text: "That works for me. I'll plan for the last two weeks of July then.", time: "11:15 AM" },
     { id: 5, sender: "co-parent", text: "Perfect! I'll update the calendar.", time: "11:20 AM" },
   ]);
+
+  const handleNewMessage = useCallback(async (newMessage: any) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Only show notification if the message is for the current user (not sent by them)
+    if (user && newMessage.receiver_id === user.id) {
+      toast.success("New message received!", {
+        description: newMessage.content.substring(0, 50) + (newMessage.content.length > 50 ? "..." : "")
+      });
+    }
+  }, []);
+
+  useMessageListener(handleNewMessage);
 
   const handleSendMessage = () => {
     if (message.trim()) {
