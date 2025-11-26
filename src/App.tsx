@@ -9,7 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CalendarPage from "./pages/CalendarPage";
 import MessagesPage from "./pages/MessagesPage";
-import PaymentsPage from "./pages/PaymentsPage";
+
 import MemoryJournal from "./pages/MemoryJournal";
 import Profile from "./pages/Profile";
 import AIAssistant from "./pages/AIAssistant";
@@ -33,7 +33,7 @@ const App = () => (
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/favors" element={<FavorsPage />} />
-            <Route path="/payments" element={<PaymentsPage />} />
+            
             <Route path="/memory-journal" element={<MemoryJournal />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
             <Route path="/profile" element={<Profile />} />
