@@ -1,6 +1,6 @@
 import Navigation from "@/components/Navigation";
 import DashboardCard from "@/components/DashboardCard";
-import { Calendar, MessageSquare, DollarSign, Users, BookHeart } from "lucide-react";
+import { Calendar, MessageSquare, Users, BookHeart } from "lucide-react";
 
 const Dashboard = () => {
   return (
@@ -31,13 +31,6 @@ const Dashboard = () => {
             description="Communicate with your co-parent in a safe, documented space"
             icon={MessageSquare}
             to="/messages"
-          />
-          
-          <DashboardCard
-            title="Payments"
-            description="Track and exchange payments for child-related expenses"
-            icon={DollarSign}
-            to="/payments"
           />
           
           <DashboardCard

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, MessageSquare, DollarSign, Heart } from "lucide-react";
+import { Calendar, MessageSquare, Heart } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const Index = () => {
@@ -47,7 +47,7 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="text-center p-8 rounded-xl bg-background shadow-card hover:shadow-soft transition-all duration-300">
               <div className="w-16 h-16 bg-gradient-warm rounded-full flex items-center justify-center mx-auto mb-6">
                 <Calendar className="w-8 h-8 text-white" />
@@ -65,16 +65,6 @@ const Index = () => {
               <h3 className="text-xl font-semibold text-foreground mb-3">In-App Messaging</h3>
               <p className="text-muted-foreground">
                 Keep all communication documented and organized in one safe space
-              </p>
-            </div>
-            
-            <div className="text-center p-8 rounded-xl bg-background shadow-card hover:shadow-soft transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-warm rounded-full flex items-center justify-center mx-auto mb-6">
-                <DollarSign className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Payment Tracking</h3>
-              <p className="text-muted-foreground">
-                Easily track and exchange payments for all child-related expenses
               </p>
             </div>
           </div>
