@@ -47,9 +47,9 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        "matte-black": "hsl(var(--matte-black))",
-        pink: "hsl(var(--pink))",
-        "pink-light": "hsl(var(--pink-light))",
+        navy: "hsl(var(--navy))",
+        coral: "hsl(var(--coral))",
+        gold: "hsl(var(--gold))",
       },
       backgroundImage: {
         'gradient-warm': 'var(--gradient-warm)',
